@@ -1,0 +1,3 @@
+.venv/
+.xnat_auth
+contaminated_sessions.csv
