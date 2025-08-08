@@ -6,6 +6,7 @@ import os
 import configparser
 
 ns = {'xnat': 'http://nrg.wustl.edu/xnat'}
+XNAT_HOST = 'https://xnat2.bu.edu'
 
 def read_auth_file(filename=".xnat_auth"):
     import configparser
@@ -22,8 +23,6 @@ def read_auth_file(filename=".xnat_auth"):
     return username, password
 
 USERNAME, PASSWORD = read_auth_file()
-XNAT_HOST = 'https://xnat2.bu.edu'
-
 
 def get_mr_sessions(session, start_date=None, end_date=None):
     """
