@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 ns = {'xnat': 'http://nrg.wustl.edu/xnat'}
 XNAT_HOST = 'https://xnat2.bu.edu'
 
-def read_auth_file(filename=".xnat_auth"):
+def read_auth_file(filename=".xnat_auth_alt"):
     if not os.path.exists(filename):
         raise FileNotFoundError(f"Auth file '{filename}' not found.")
     config = configparser.ConfigParser()
