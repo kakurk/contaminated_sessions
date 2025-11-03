@@ -6,6 +6,7 @@ import os
 import configparser
 import subprocess
 from datetime import datetime, timedelta
+import argparse
 
 ns = {'xnat': 'http://nrg.wustl.edu/xnat'}
 XNAT_HOST = 'https://xnat2.bu.edu'
@@ -29,6 +30,9 @@ def get_mr_sessions(session, start_date=None, end_date=None):
     """
     Fetch all sessions from XNAT, optionally filtering by date range using XNAT REST API query parameters.
     Dates should be in 'YYYY-MM-DD' format.
+
+    See the XNAT API for more information:
+    https://wiki.xnat.org/xnat-api/experiment-api
     """
     base_url = f'{XNAT_HOST}/data/experiments?format=csv&xsiType=xnat:mrSessionData'
     date_param = None
@@ -95,8 +99,10 @@ def send_email(body_or_file, start_date, end_date, recipient="kkurkela@bu.edu", 
         print(f"Failed to send email: {e}")
 
 def main():
-    import argparse
 
+    # parse input arguments
+    # --start-date and --end-date in YYYY-MM-DD format
+    # if not provided, default to last 7 days
     parser = argparse.ArgumentParser(description="Find sessions with scan/project mismatch, optionally filtering by date range.")
     parser.add_argument('--start-date', type=str, help='Start date (YYYY-MM-DD)', required=False)
     parser.add_argument('--end-date', type=str, help='End date (YYYY-MM-DD)', required=False)
@@ -108,11 +114,20 @@ def main():
     if not args.start_date:
         args.start_date = (datetime.today() - timedelta(days=7)).strftime("%Y-%m-%d")
 
+    # start a requests session
+    # the algorithm is:
+    # 1. get all MR sessions in the date range
+    # 2. for each session, check if any scans have a different project than the session
+    # 3. if so, flag the session
+    # 4. compile results into a dataframe and email the report to, by default, Kyle Kurkela <kkurkela@bu.edu>
     with requests.Session() as session:
+
+        # get all MR sessions in the date range
         session.auth = (USERNAME, PASSWORD)
         df_sessions = get_mr_sessions(session, start_date=args.start_date, end_date=args.end_date)
         print(f"Total sessions: {len(df_sessions)}")
 
+        # flag MR sessions are contaminated
         flagged_session_ids = []
         for _, row in df_sessions.iterrows():
             session_id = row['ID']
@@ -120,11 +135,13 @@ def main():
                 print(f"Flagged session with project mismatch: {session_id}")
                 flagged_session_ids.append(session_id)
 
+        # compile results into a dataframe
         df_flagged = df_sessions[df_sessions['ID'].isin(flagged_session_ids)]
 
         print("\nSummary:")
         print(f"Flagged {len(df_flagged)} sessions with scan/project mismatch.")
 
+        # email a report and write a tabular CSV file with information on the flagged sessions.
         if not df_flagged.empty:
             print("\nFlagged Sessions DataFrame:")
             print(df_flagged)
