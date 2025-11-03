@@ -1,3 +1,6 @@
 .venv/
 .xnat_auth
+.xnat_auth_alt
 contaminated_sessions.csv
+__pycache__/
+cron.log
