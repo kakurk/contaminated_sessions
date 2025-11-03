@@ -58,6 +58,14 @@ def get_mr_sessions(session, start_date=None, end_date=None):
     return df
 
 def check_project_mismatch(session, session_id):
+    """
+    Check if any scans in the session have a different project than the session itself.
+    
+    See the XNAT API for more information:
+
+    https://wiki.xnat.org/xnat-api/experiment-api#ExperimentAPI-GetASingleExperimentRecord
+    
+    """
     url = f'{XNAT_HOST}/data/experiments/{session_id}?format=xml'
     response = session.get(url)
     if response.status_code != 200:
