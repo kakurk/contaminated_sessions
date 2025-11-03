@@ -12,6 +12,15 @@ ns = {'xnat': 'http://nrg.wustl.edu/xnat'}
 XNAT_HOST = 'https://xnat2.bu.edu'
 
 def read_auth_file(filename=".xnat_auth_alt"):
+    """
+    read_auth_file is designed to read a configuration file (default name: .xnat_auth_alt) that contains authentication details for accessing an XNAT server.
+    The file is expected to have a section named 'auth' with 'username' and 'password' entries:
+
+    [auth]
+    username = username
+    password = password
+    """
+
     if not os.path.exists(filename):
         raise FileNotFoundError(f"Auth file '{filename}' not found.")
     config = configparser.ConfigParser()
@@ -37,6 +46,7 @@ def get_mr_sessions(session, start_date=None, end_date=None):
     base_url = f'{XNAT_HOST}/data/experiments?format=csv&xsiType=xnat:mrSessionData'
     date_param = None
 
+    # parse the date parameters to match the format XNAT API requires. See API docs above.
     def to_mmddyyyy(date_str):
         return datetime.strptime(date_str, "%Y-%m-%d").strftime("%m/%d/%Y")
 
@@ -53,6 +63,8 @@ def get_mr_sessions(session, start_date=None, end_date=None):
         url = base_url
     response = session.get(url)
     response.raise_for_status()
+
+    # Return as a pandas DataFrame
     csv_content = response.text
     df = pd.read_csv(StringIO(csv_content))
     return df
