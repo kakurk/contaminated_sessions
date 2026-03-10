@@ -1,5 +1,3 @@
-import os
-import configparser
 from contaminated_sessions import read_auth_file
 import tempfile
 

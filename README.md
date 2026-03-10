@@ -2,7 +2,7 @@
 
 This repository houses a tool for scanning an XNAT instance for "contaminated" scans sessions. 
 
-An "XNAT instance" is an XNAT database running on a specific machine. As of this writing, at Boston University's Cognitive Neuroimaging Center, there are currently two XNAT instances: xnat.bu.edu AND xnat2.bu.edu.
+An "XNAT instance" is an XNAT database running on a specific machine. As of this writing, at Boston University's Cognitive Neuroimaging Center, there are currently two XNAT instances: xnat-archive.bu.edu AND xnat2.bu.edu.
 
 Contaminated scans sessions are scan sessions (in XNAT's terminology, "[experiments](https://wiki.xnat.org/documentation/understanding-the-xnat-data-model#UnderstandingtheXNATDataModel-Experiments(xnat:experimentData))") that contain scans that should be in a different scan session.
 
@@ -22,6 +22,14 @@ Before running, you need to make sure that the virtual enviorment is activated. 
 
     # install all of the requirements
     > pip install -r requirements.txt
+
+
+By default, this tool assumes that there is a hidden text file ".xnat_auth_alt" in the same directory as this script that has your xnat credentials.
+
+    cat .xnat_auth_alt
+    [auth]
+    username = USERNAME
+    password = PASSWORD
 
 Usage:
 
